@@ -1,0 +1,82 @@
+# 本地开发环境
+# 项目启动端口
+server:
+  port: 9001
+# DataSource Config
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/pm?useSSL=false&useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: 12345678
+    # druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+
+    # 基本配置
+    initialSize: 1
+    minIdle: 3
+    maxActive: 20
+    # 配置获取链接等待时间
+    maxWait: 60000
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 30000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    # 打开PSCache，并且指定每个连接上PSCache的大小
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 20
+    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+    filters: stat,wall,slf4j
+    # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    # 合并多个DruidDataSource的监控数据
+    #useGlobalDataSourceStat: true
+
+  # redis
+  redis:
+    # ip
+    host: 47.102.202.189
+    # port
+    port: 6379
+    # password
+    # password:
+    jedis:
+      pool:
+        # 最大可用连接数（默认为8，负数表示无限）
+        max-active: 8
+        # 从连接池中获取连接最大等待时间（默认为-1，单位为毫秒，负数表示无限）
+        max-wait: -1
+        # 最大空闲连接数（默认为8，负数表示无限）
+        max-idle: 8
+        # 最小空闲连接数（默认为0，该值只有为正数才有用）
+        min-idle: 0
+    # redis连接超时时间（单位毫秒）
+    connect-timeout: 1000
+  # 启动aop
+  aop:
+    auto: true
+
+# mybatis-plus
+mybatis-plus:
+  configuration:
+    # 打印sql语句
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # xml映射文件
+  mapper-locations: classpath:mapper/*.xml
+  global-config:
+    # 逻辑删除
+    db-config:
+      logic-delete-field: flag
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+  # 通用枚举
+  type-enums-package: com.rpm.enums
+
+# 图片保存设置
+imgSetting:
+  # path: D://mywork//uploadfile
+  path: /Users/chenya/Desktop

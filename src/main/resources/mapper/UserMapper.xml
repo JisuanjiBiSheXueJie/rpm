@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpm.mapper.UserMapper">
+
+    <select id="getUserPage" resultType="com.rpm.domain.User">
+        select * from user ${ew.customSqlSegment}
+    </select>
+
+    <select id="getDelUser" resultType="com.rpm.domain.User">
+        select * from user ${ew.customSqlSegment}
+    </select>
+
+    <update id="refreshUser">
+        update user set is_del = #{code} ${ew.customSqlSegment}
+    </update>
+
+    <update id="thawUser">
+        update user set status = #{code} ${ew.customSqlSegment}
+    </update>
+
+
+</mapper>

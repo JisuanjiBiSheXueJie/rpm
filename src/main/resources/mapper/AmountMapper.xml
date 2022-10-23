@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpm.mapper.AmountMapper">
+
+    <select id="getAmountList" resultType="com.rpm.domain.Amount">
+        select *,user.realname from amount am
+        left join user on user.id = am.pay_id
+        ${ew.customSqlSegment}
+    </select>
+
+    <select id="getAmountNum" resultType="com.rpm.vo.AmountNumVo">
+        SELECT
+            a.amount_time amount_time,
+            IFNULL(b.total,0) as amount_count
+        FROM
+        (
+        SELECT
+            DATE_SUB( CURDATE( ), INTERVAL 6 DAY ) AS amount_time UNION ALL
+        SELECT
+            DATE_SUB( CURDATE( ), INTERVAL 5 DAY ) AS amount_time UNION ALL
+        SELECT
+            DATE_SUB( CURDATE( ), INTERVAL 4 DAY ) AS amount_time UNION ALL
+        SELECT
+            DATE_SUB( CURDATE( ), INTERVAL 3 DAY ) AS amount_time UNION ALL
+        SELECT
+            DATE_SUB( CURDATE( ), INTERVAL 2 DAY ) AS amount_time UNION ALL
+        SELECT
+            DATE_SUB( CURDATE( ), INTERVAL 1 DAY ) AS amount_time UNION ALL
+        SELECT
+            DATE_SUB( CURDATE( ), INTERVAL 0 DAY ) AS amount_time
+        ) a
+        LEFT JOIN (
+        SELECT
+            DATE_FORMAT( amount_time, '%Y-%m-%d' ) AS datetime,
+            SUM( pay_amount ) AS total
+        FROM
+        amount
+        WHERE
+            amount_time &lt; CURDATE( ) + 1 AND amount_time >= DATE_SUB( CURDATE( ), INTERVAL 7 DAY )
+        GROUP BY
+            DATE_FORMAT( amount_time, '%Y-%m-%d' )
+        ) b ON a.amount_time = b.datetime
+
+        order by a.amount_time desc
+    </select>
+
+</mapper>

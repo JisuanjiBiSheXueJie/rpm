@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpm.mapper.SysLogLoginMapper">
+
+    <select id="getLogPage" resultType="com.rpm.domain.SysLogLogin">
+        select * from sys_log_login ${ew.customSqlSegment}
+    </select>
+
+
+    <!--在mybatis中使用 >=和 <= 会导致报错，元素不被识别
+            解决方法
+            1、（1） <![CDATA[带有>=和 <=的语句括起来]]>
+            2、用&lt；代替小于号，用&gt；代替大于号
+    -->
+
+    <select id="getLoginNum" resultType="com.rpm.vo.LoginNumVo">
+        SELECT
+            a.opt_time login_time,
+            IFNULL(b.total,0) as login_num
+        FROM
+        (
+        SELECT
+            DATE_SUB( CURDATE( ), INTERVAL 6 DAY ) AS opt_time UNION ALL
+        SELECT
+            DATE_SUB( CURDATE( ), INTERVAL 5 DAY ) AS opt_time UNION ALL
+        SELECT
+            DATE_SUB( CURDATE( ), INTERVAL 4 DAY ) AS opt_time UNION ALL
+        SELECT
+            DATE_SUB( CURDATE( ), INTERVAL 3 DAY ) AS opt_time UNION ALL
+        SELECT
+            DATE_SUB( CURDATE( ), INTERVAL 2 DAY ) AS opt_time UNION ALL
+        SELECT
+            DATE_SUB( CURDATE( ), INTERVAL 1 DAY ) AS opt_time UNION ALL
+        SELECT
+            DATE_SUB( CURDATE( ), INTERVAL 0 DAY ) AS opt_time
+        ) a
+        LEFT JOIN (
+        SELECT
+            DATE_FORMAT( opt_time, '%Y-%m-%d' ) AS datetime,
+        count( id ) AS total
+        FROM
+            sys_log_login
+        WHERE
+            opt = 1
+        <if test="loginId != null and loginId != ''">
+            AND login_id = #{loginId}
+        </if>
+            AND opt_time &lt; CURDATE() + 1 AND opt_time >= DATE_SUB( CURDATE( ), INTERVAL 7 DAY )
+            GROUP BY
+            DATE_FORMAT( opt_time, '%Y-%m-%d' )
+        ) b ON a.opt_time = b.datetime
+        order by a.opt_time desc
+    </select>
+
+</mapper>
